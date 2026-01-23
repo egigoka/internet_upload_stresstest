@@ -27,14 +27,27 @@ Run on the machine that will receive the upload traffic:
 ./server.sh [port]
 ```
 
-Default port: 5201
+- `port` - Server port (default: 5201)
 
-### Client
+Example:
+```bash
+./server.sh 5201
+```
 
-Run on the machine whose upload you want to stress test:
+### Client Scripts
+
+Three client variants are available depending on your needs. All clients:
+- Log speed and runtime every 10 seconds
+- Use 8 parallel streams to maximize bandwidth saturation
+- Create timestamped log files
+- Show total runtime on exit
+
+#### client-once.sh - Single run until outage
+
+Runs one continuous upload test and stops when connection fails:
 
 ```bash
-./client.sh <server_ip> [port]
+./client-once.sh <server_ip> [port]
 ```
 
 - `server_ip` - Server IP address or hostname (required)
@@ -42,15 +55,48 @@ Run on the machine whose upload you want to stress test:
 
 Example:
 ```bash
-./client.sh 192.168.1.100
+./client-once.sh 192.168.1.100
 ```
 
-The client will:
-- Run continuous upload tests indefinitely
-- Log speed and runtime every 10 seconds
-- Use 8 parallel streams to maximize bandwidth saturation
-- Automatically stop when connection fails (internet outage)
-- Show total runtime on exit
+Best for: Testing how long your connection stays stable.
+
+#### client-infinite.sh - Retry forever
+
+Runs upload tests continuously, automatically retrying after outages:
+
+```bash
+./client-infinite.sh <server_ip> [port]
+```
+
+- `server_ip` - Server IP address or hostname (required)
+- `port` - Server port (default: 5201)
+
+Example:
+```bash
+./client-infinite.sh 192.168.1.100
+```
+
+Best for: Long-term stress testing with automatic recovery.
+
+#### client-until.sh - Run until specific time
+
+Runs upload tests until a specified time, with automatic retry on outages:
+
+```bash
+./client-until.sh <server_ip> <stop_time> [port]
+```
+
+- `server_ip` - Server IP address or hostname (required)
+- `stop_time` - Time to stop in HH:MM format (e.g., 23:00 or 6:00)
+- `port` - Server port (default: 5201)
+
+Examples:
+```bash
+./client-until.sh 192.168.1.100 23:00      # Run until 11 PM
+./client-until.sh 192.168.1.100 6:00 5201  # Run until 6 AM on custom port
+```
+
+Best for: Scheduled testing windows (e.g., run overnight until morning).
 
 ## Notes
 
